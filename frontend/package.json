@@ -1,0 +1,25 @@
+{
+    "name": "professor-interview-system",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start"
+    },
+    "dependencies": {
+        "better-sqlite3": "^9.4.3",
+        "next": "^15.2.0",
+        "qrcode": "^1.5.3",
+        "react": "^18",
+        "react-dom": "^18"
+    },
+    "devDependencies": {
+        "@types/better-sqlite3": "^7.6.8",
+        "@types/node": "^20",
+        "@types/qrcode": "^1.5.5",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
+        "typescript": "^5"
+    }
+}
