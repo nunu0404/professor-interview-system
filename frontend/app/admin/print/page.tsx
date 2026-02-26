@@ -24,16 +24,19 @@ export default function PrintPage() {
     const [assignments, setAssignments] = useState<Assignment[]>([]);
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState<ViewMode>('student');
+    const [role, setRole] = useState<'admin' | 'viewer' | null>(null);
 
     const load = useCallback(async () => {
-        const [s, l, a] = await Promise.all([
+        const [s, l, a, authRes] = await Promise.all([
             fetch('/api/students').then(r => r.json()),
             fetch('/api/labs').then(r => r.json()),
             fetch('/api/assignments').then(r => r.json()),
+            fetch('/api/auth', { method: 'GET' }).then(r => r.json()).catch(() => ({ role: null })),
         ]);
         setStudents(Array.isArray(s) ? s : []);
         setLabs(Array.isArray(l) ? l : []);
         setAssignments(Array.isArray(a) ? a : []);
+        setRole(authRes.role);
         setLoading(false);
     }, []);
 
@@ -63,7 +66,7 @@ export default function PrintPage() {
                 background: 'var(--bg2)', borderBottom: '1px solid var(--border)', padding: '12px 24px',
                 display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 100
             }}>
-                <a href="/admin" className="btn btn-secondary btn-sm">← 돌아가기</a>
+                {role === 'admin' && <a href="/admin" className="btn btn-secondary btn-sm">← 돌아가기</a>}
                 <div style={{ flex: 1, display: 'flex', gap: 4 }}>
                     <button className={`btn btn-sm ${view === 'student' ? 'btn-primary' : 'btn-secondary'}`}
                         onClick={() => setView('student')}>👥 학생별 배정표</button>
@@ -71,8 +74,12 @@ export default function PrintPage() {
                         onClick={() => setView('lab')}>🔬 연구실별 배정표</button>
                 </div>
                 <button onClick={() => window.print()} className="btn btn-primary btn-sm">🖨️ 인쇄하기</button>
-                <a href="/api/export/students" className="btn btn-secondary btn-sm" download>⬇️ 학생 CSV</a>
-                <a href="/api/export/assignments" className="btn btn-secondary btn-sm" download>⬇️ 배정 CSV</a>
+                {role === 'admin' && (
+                    <>
+                        <a href="/api/export/students" className="btn btn-secondary btn-sm" download>⬇️ 학생 CSV</a>
+                        <a href="/api/export/assignments" className="btn btn-secondary btn-sm" download>⬇️ 배정 CSV</a>
+                    </>
+                )}
             </div>
 
             <div style={{ padding: '24px', maxWidth: 1100, margin: '0 auto' }}>

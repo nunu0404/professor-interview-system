@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 const NAV_LINKS = [
     { href: '/admin', label: '📊 대시보드', exact: true },
@@ -14,21 +15,38 @@ const NAV_LINKS = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const router = useRouter();
+    const [role, setRole] = useState<'admin' | 'viewer' | null>(null);
+
+    useEffect(() => {
+        fetch('/api/auth', { method: 'GET' })
+            .then(res => res.json())
+            .then(data => setRole(data.role))
+            .catch(() => setRole(null));
+    }, []);
 
     async function logout() {
         await fetch('/api/auth', { method: 'DELETE' });
         router.replace('/admin/login');
     }
 
+    if (role === null) return null; // Wait for role
+
     return (
         <>
             <nav className="nav">
-                <Link href="/" className="nav-brand">
-                    <div className="nav-logo">🎓</div>
-                    <span>학과 소개의 날 — 관리자</span>
-                </Link>
+                {role === 'admin' ? (
+                    <Link href="/" className="nav-brand">
+                        <div className="nav-logo">🎓</div>
+                        <span>학과 소개의 날 — 관리자</span>
+                    </Link>
+                ) : (
+                    <div className="nav-brand" style={{ cursor: 'default' }}>
+                        <div className="nav-logo">🎓</div>
+                        <span>학과 소개의 날 — 관리자</span>
+                    </div>
+                )}
                 <div className="nav-links">
-                    {NAV_LINKS.map(l => {
+                    {NAV_LINKS.filter(l => role === 'admin' || l.href === '/admin/print').map(l => {
                         const isActive = l.exact ? pathname === l.href : pathname.startsWith(l.href);
                         return (
                             <Link key={l.href} href={l.href} className={`nav-link ${isActive ? 'active' : ''}`}>
