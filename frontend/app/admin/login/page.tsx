@@ -22,7 +22,11 @@ function LoginForm() {
             });
             const data = await res.json();
             if (!res.ok) { setError(data.error); return; }
-            router.replace(from);
+            if (data.role === 'viewer') {
+                router.replace('/admin/print');
+            } else {
+                router.replace(from);
+            }
         } catch {
             setError('로그인 중 오류가 발생했습니다.');
         } finally {
