@@ -18,7 +18,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const [role, setRole] = useState<'admin' | 'viewer' | null>(null);
 
     useEffect(() => {
-        fetch('/api/auth', { method: 'GET' })
+        fetch('/api/auth', { method: 'GET', cache: 'no-store' })
             .then(res => res.json())
             .then(data => setRole(data.role))
             .catch(() => setRole(null));

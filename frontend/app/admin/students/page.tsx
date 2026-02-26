@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 interface Student {
     id: number; name: string; phone: string; email: string; affiliation: string;
@@ -14,6 +14,9 @@ export default function StudentsPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
 
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [uploading, setUploading] = useState(false);
+
     const load = useCallback(() => {
         fetch('/api/students').then(r => r.json()).then(d => {
             setStudents(Array.isArray(d) ? d : []);
@@ -22,6 +25,35 @@ export default function StudentsPage() {
     }, []);
 
     useEffect(() => { load(); }, [load]);
+
+    async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await fetch('/api/students/upload', {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                alert(`성공적으로 ${data.count}명의 학생 데이터를 업로드했습니다!`);
+                load();
+            } else {
+                alert(`업로드 실패: ${data.error}`);
+            }
+        } catch (e) {
+            alert('업로드 중 오류가 발생했습니다.');
+        } finally {
+            setUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    }
 
     const filtered = students.filter(s =>
         s.name.includes(search) || s.phone.includes(search) || s.email.includes(search) || (s.affiliation || '').includes(search)
@@ -40,6 +72,10 @@ export default function StudentsPage() {
                     <p>총 <strong style={{ color: 'var(--accent)' }}>{students.length}명</strong> 신청 완료</p>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
+                    <input type="file" accept=".csv" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileUpload} />
+                    <button className="btn btn-primary btn-sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+                        {uploading ? <span className="spin">⟳</span> : '📤 CSV 일괄 등록'}
+                    </button>
                     <button className="btn btn-secondary btn-sm" onClick={load}>🔄 새로고침</button>
                 </div>
             </div>

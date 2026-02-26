@@ -31,7 +31,7 @@ export default function PrintPage() {
             fetch('/api/students').then(r => r.json()),
             fetch('/api/labs').then(r => r.json()),
             fetch('/api/assignments').then(r => r.json()),
-            fetch('/api/auth', { method: 'GET' }).then(r => r.json()).catch(() => ({ role: null })),
+            fetch('/api/auth', { method: 'GET', cache: 'no-store' }).then(r => r.json()).catch(() => ({ role: null })),
         ]);
         setStudents(Array.isArray(s) ? s : []);
         setLabs(Array.isArray(l) ? l : []);
