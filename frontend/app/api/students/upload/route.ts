@@ -84,7 +84,7 @@ export async function POST(req: Request) {
                 choice3_lab_id=excluded.choice3_lab_id
         `);
 
-        let successCount = 0;
+        const processedPhones = new Set<string>();
 
         db.transaction(() => {
             for (let i = 1; i < rows.length; i++) {
@@ -113,11 +113,11 @@ export async function POST(req: Request) {
                 const l3 = idxC3 !== -1 ? findLabId(cols[idxC3]) : null;
 
                 insert.run(name, phone, email, affiliation, l1, l2, l3);
-                successCount++;
+                processedPhones.add(phone);
             }
         })();
 
-        return NextResponse.json({ success: true, count: successCount });
+        return NextResponse.json({ success: true, count: processedPhones.size });
 
     } catch (e) {
         return NextResponse.json({ error: String(e) }, { status: 500 });
