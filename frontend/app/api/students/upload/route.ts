@@ -47,6 +47,7 @@ export async function POST(req: Request) {
             const norm = h.replace(/\s+/g, '');
             return norm.includes('희망연구실3') || norm.includes('3지망');
         });
+        const idxDesiredMajor = headers.findIndex(h => h.replace(/\s+/g, '').includes('희망전공'));
 
         if (idxName === -1 || idxPhone === -1) {
             return NextResponse.json({ error: '신청자명 또는 휴대전화번호 열을 찾을 수 없습니다.' }, { status: 400 });
@@ -88,6 +89,15 @@ export async function POST(req: Request) {
         db.transaction(() => {
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i].map(c => String(c || '').trim());
+
+                // Filter by '희망전공' (Desired Major)
+                if (idxDesiredMajor !== -1) {
+                    const desiredMajor = (cols[idxDesiredMajor] || '').replace(/\s+/g, '');
+                    if (!desiredMajor.includes('전기전자컴퓨터공학과')) {
+                        continue;
+                    }
+                }
+
                 const name = cols[idxName] || '';
                 const phone = cols[idxPhone] ? cols[idxPhone].replace(/[^0-9]/g, '') : '';
                 if (!name || !phone) continue;
