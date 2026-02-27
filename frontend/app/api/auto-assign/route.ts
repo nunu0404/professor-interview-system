@@ -33,23 +33,19 @@ export async function POST() {
             DO UPDATE SET lab_id = excluded.lab_id, updated_at = CURRENT_TIMESTAMP
         `);
 
-        // Helper: pick a random lab different from `excludeIds`
-        const getRandomLab = (excludeIds: Set<number>) => {
-            const available = labs.filter(l => !excludeIds.has(l.id));
-            if (available.length === 0) return labs.length > 0 ? labs[0].id : 0;
-            return available[Math.floor(Math.random() * available.length)].id;
-        };
-
-        // Helper: generate permutations of an array
-        function generatePermutations<T>(arr: T[]): T[][] {
-            if (arr.length <= 1) return [arr];
-            const result: T[][] = [];
-            for (let i = 0; i < arr.length; i++) {
-                const current = arr[i];
-                const remaining = arr.slice(0, i).concat(arr.slice(i + 1));
-                const remainingPerms = generatePermutations(remaining);
-                for (const perm of remainingPerms) {
-                    result.push([current, ...perm]);
+        // Helper: generate mappings of K items to N slots
+        function generatePermutations<T, U>(items: T[], slots: U[]): { item: T, slot: U }[][] {
+            if (items.length === 0) return [[]];
+            const result: { item: T, slot: U }[][] = [];
+            const currentItem = items[0];
+            const remainingItems = items.slice(1);
+            
+            for (let i = 0; i < slots.length; i++) {
+                const currentSlot = slots[i];
+                const remainingSlots = slots.slice(0, i).concat(slots.slice(i + 1));
+                const subPerms = generatePermutations(remainingItems, remainingSlots);
+                for (const p of subPerms) {
+                    result.push([{ item: currentItem, slot: currentSlot }, ...p]);
                 }
             }
             return result;
@@ -86,18 +82,11 @@ export async function POST() {
                     if (!labsUsed.has(id)) intendedLabsSet.add(id);
                 });
 
-                // We need exactly exactly `sessionsToFill.length` labs. Fill blanks with random unvisited labs.
-                while (intendedLabsSet.size < sessionsToFill.length) {
-                    const rLab = getRandomLab(new Set([...labsUsed, ...intendedLabsSet]));
-                    if (rLab === 0) break; // Emergency break if no labs exist at all
-                    intendedLabsSet.add(rLab);
-                }
-
                 const labsToAssign = Array.from(intendedLabsSet).slice(0, sessionsToFill.length);
-                if (labsToAssign.length !== sessionsToFill.length) continue; // Should rarely happen unless 0 labs
+                if (labsToAssign.length === 0) continue; // Nothing left to assign
 
                 // Permute sessions mappings to minimize load
-                const perms = generatePermutations(sessionsToFill);
+                const perms = generatePermutations(labsToAssign, sessionsToFill);
                 
                 let bestPerm = perms[0];
                 let minScore = Infinity;
@@ -105,9 +94,9 @@ export async function POST() {
                 for (const p of perms) {
                     let maxLoad = 0;
                     let sumLoad = 0;
-                    for (let i = 0; i < p.length; i++) {
-                        const sessionNum = p[i];
-                        const labId = labsToAssign[i];
+                    for (const mapping of p) {
+                        const sessionNum = mapping.slot;
+                        const labId = mapping.item;
                         const count = slotCount[labId] ? slotCount[labId][sessionNum] : 0;
                         if (count > maxLoad) maxLoad = count;
                         sumLoad += count;
@@ -120,9 +109,9 @@ export async function POST() {
                 }
 
                 // Execute the best assignment permutation
-                for (let i = 0; i < bestPerm.length; i++) {
-                    const sessionNum = bestPerm[i];
-                    const labId = labsToAssign[i];
+                for (const mapping of bestPerm) {
+                    const sessionNum = mapping.slot;
+                    const labId = mapping.item;
                     upsert.run(student.id, sessionNum, labId);
                     if (slotCount[labId]) slotCount[labId][sessionNum]++;
                     assigned++;
