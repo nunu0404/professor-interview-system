@@ -194,22 +194,32 @@ export default function PrintPage() {
                                                 ) : (
                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                                                         {sessionStudents.map((a, idx) => {
-                                                            const rank = choiceRank(a, lab.id);
-                                                            const isManual = rank === '관리자배정';
+                                                            const isManual = a.choice1_lab_id !== lab.id && a.choice2_lab_id !== lab.id && a.choice3_lab_id !== lab.id;
+                                                            let rank = '';
+                                                            if (a.choice1_lab_id === lab.id) rank = '1지망';
+                                                            else if (a.choice2_lab_id === lab.id) rank = '2지망';
+                                                            else if (a.choice3_lab_id === lab.id) rank = '3지망';
+                                                            else rank = '임의배정';
+
+                                                            const c1 = labs.find(l => l.id === a.choice1_lab_id)?.name;
+                                                            const c2 = labs.find(l => l.id === a.choice2_lab_id)?.name;
+                                                            const c3 = labs.find(l => l.id === a.choice3_lab_id)?.name;
+                                                            const hasChoices = c1 || c2 || c3;
+
                                                             return (
                                                                 <div key={a.student_id} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                                                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem' }}>
                                                                         <span style={{ color: 'var(--text3)', minWidth: 20 }}>{idx + 1}.</span>
                                                                         <span style={{ fontWeight: 600 }}>{a.student_name}</span>
-                                                                        <span style={{ color: 'var(--text3)' }}>{a.phone}</span>
-                                                                        {a.affiliation && <span style={{ color: 'var(--text3)', fontSize: '0.75rem' }}>· {a.affiliation}</span>}
-                                                                        <span className={`badge badge-${isManual ? 'None' : session}`} style={{ marginLeft: 'auto', fontSize: '0.7rem', background: isManual ? 'var(--bg3)' : undefined, color: isManual ? 'var(--text2)' : undefined }}>
+                                                                        <span style={{ color: 'var(--text3)', whiteSpace: 'nowrap' }}>{a.phone}</span>
+                                                                        {a.affiliation && <span style={{ color: 'var(--text3)', fontSize: '0.75rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>· {a.affiliation}</span>}
+                                                                        <span className={`badge badge-${isManual ? 'None' : session}`} style={{ marginLeft: 'auto', fontSize: '0.7rem', whiteSpace: 'nowrap', background: isManual ? 'var(--bg3)' : undefined, color: isManual ? 'var(--text2)' : undefined }}>
                                                                             {rank}
                                                                         </span>
                                                                     </div>
-                                                                    {isManual && (
+                                                                    {isManual && hasChoices && (
                                                                         <div style={{ marginLeft: 26, fontSize: '0.72rem', color: 'var(--text3)' }}>
-                                                                            ↳ 지망: 1.{labs.find(l => l.id === a.choice1_lab_id)?.name || '-'} / 2.{labs.find(l => l.id === a.choice2_lab_id)?.name || '-'} / 3.{labs.find(l => l.id === a.choice3_lab_id)?.name || '-'}
+                                                                            ↳ 원래지망: {c1 ? `1.${c1}` : ''} {c2 ? `/ 2.${c2}` : ''} {c3 ? `/ 3.${c3}` : ''}
                                                                         </div>
                                                                     )}
                                                                 </div>

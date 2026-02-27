@@ -99,10 +99,16 @@ export default function AssignmentsPage() {
         if (student.choice2_lab_id === labId) return <span className="badge badge-2" style={{ fontSize: '0.7rem', marginLeft: 4 }}>2지망</span>;
         if (student.choice3_lab_id === labId) return <span className="badge badge-3" style={{ fontSize: '0.7rem', marginLeft: 4 }}>3지망</span>;
 
-        const c1 = student.choice1_name || '-';
-        const c2 = student.choice2_name || '-';
-        const c3 = student.choice3_name || '-';
-        return <span style={{ fontSize: '0.7rem', color: 'var(--text3)', marginLeft: 6 }}>↳ 지망: 1.{c1} / 2.{c2} / 3.{c3}</span>;
+        const c1 = student.choice1_name;
+        const c2 = student.choice2_name;
+        const c3 = student.choice3_name;
+        const hasChoices = c1 || c2 || c3;
+
+        return hasChoices ? (
+            <span style={{ fontSize: '0.7rem', color: 'var(--text3)', marginLeft: 6 }}>
+                ↳ 원래지망: {c1 ? `1.${c1}` : ''} {c2 ? `/ 2.${c2}` : ''} {c3 ? `/ 3.${c3}` : ''}
+            </span>
+        ) : null;
     }
 
     if (loading) return <div style={{ padding: 48, textAlign: 'center', color: 'var(--text2)' }}>불러오는 중...</div>;
