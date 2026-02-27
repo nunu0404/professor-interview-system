@@ -23,9 +23,9 @@ function LoginForm() {
             const data = await res.json();
             if (!res.ok) { setError(data.error); return; }
             if (data.role === 'viewer') {
-                router.replace('/admin/print');
+                window.location.href = '/admin/print';
             } else {
-                router.replace(from);
+                window.location.href = from;
             }
         } catch {
             setError('로그인 중 오류가 발생했습니다.');
@@ -85,7 +85,7 @@ function LoginForm() {
 
 export default function LoginPage() {
     return (
-        <Suspense>
+        <Suspense fallback={<div style={{ padding: 48, textAlign: 'center' }}>로딩 중...</div>}>
             <LoginForm />
         </Suspense>
     );

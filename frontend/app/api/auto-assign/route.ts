@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 // Auto-assign students to sessions based on their 1→2→3 preference
 export async function POST() {
     try {

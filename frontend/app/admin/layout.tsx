@@ -22,17 +22,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             .then(res => res.json())
             .then(data => setRole(data.role))
             .catch(() => setRole(null));
-    }, []);
+    }, [pathname]);
 
     async function logout() {
         await fetch('/api/auth', { method: 'DELETE' });
         router.replace('/admin/login');
     }
 
-    if (role === null) return null; // Wait for role
+    // Don't block the login page with auth check
+    if (pathname === '/admin/login') {
+        return <div className="admin-layout-root">{children}</div>;
+    }
+
+    if (role === null || role === undefined) {
+        return (
+            <div className="admin-layout-root">
+                <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span className="spin" style={{ fontSize: '2rem' }}>⟳</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <>
+        <div className="admin-layout-root">
             <nav className="nav">
                 {role === 'admin' ? (
                     <Link href="/" className="nav-brand">
@@ -61,7 +74,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
             </nav>
             <main className="page">{children}</main>
-        </>
+        </div>
     );
 }
 
