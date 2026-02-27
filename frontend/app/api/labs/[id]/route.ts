@@ -21,9 +21,21 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     try {
         const db = getDb();
         const { id } = await params;
-        db.prepare('DELETE FROM labs WHERE id = ?').run(id);
+
+        db.transaction(() => {
+            // Remove from assignments
+            db.prepare('DELETE FROM assignments WHERE lab_id = ?').run(id);
+            // Nullify student choices
+            db.prepare('UPDATE students SET choice1_lab_id = NULL WHERE choice1_lab_id = ?').run(id);
+            db.prepare('UPDATE students SET choice2_lab_id = NULL WHERE choice2_lab_id = ?').run(id);
+            db.prepare('UPDATE students SET choice3_lab_id = NULL WHERE choice3_lab_id = ?').run(id);
+            // Delete the lab
+            db.prepare('DELETE FROM labs WHERE id = ?').run(id);
+        })();
+
         return NextResponse.json({ success: true });
     } catch (e) {
+        console.error("Delete lab error:", e);
         return NextResponse.json({ error: String(e) }, { status: 500 });
     }
 }
