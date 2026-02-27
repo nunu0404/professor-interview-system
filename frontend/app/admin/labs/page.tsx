@@ -1,12 +1,12 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 interface Lab {
     id: number; name: string; professor_name: string;
-    capacity: number; description: string; location: string;
+    capacity: number; location: string;
 }
 
-const EMPTY_LAB = { name: '', professor_name: '', capacity: 5, description: '', location: '' };
+const EMPTY_LAB = { name: '', professor_name: '', capacity: 5, location: '' };
 
 export default function LabsPage() {
     const [labs, setLabs] = useState<Lab[]>([]);
@@ -23,7 +23,7 @@ export default function LabsPage() {
 
     function startEdit(lab: Lab) {
         setEditing(lab);
-        setForm({ name: lab.name, professor_name: lab.professor_name, capacity: lab.capacity, description: lab.description || '', location: lab.location || '' });
+        setForm({ name: lab.name, professor_name: lab.professor_name, capacity: lab.capacity, location: lab.location || '' });
         setAdding(false);
     }
     function startAdd() { setAdding(true); setEditing(null); setForm({ ...EMPTY_LAB }); }
@@ -58,6 +58,32 @@ export default function LabsPage() {
         else setMsg({ type: 'error', text: '삭제 실패' });
     }
 
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [uploading, setUploading] = useState(false);
+
+    async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch('/api/labs/upload', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (res.ok) {
+                setMsg({ type: 'success', text: `성공적으로 ${data.count}개의 연구실 데이터를 업로드했습니다!` });
+                load();
+            } else {
+                setMsg({ type: 'error', text: `업로드 실패: ${data.error}` });
+            }
+        } catch (err) {
+            setMsg({ type: 'error', text: '업로드 중 오류가 발생했습니다.' });
+        } finally {
+            setUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    }
+
     const FormPanel = () => (
         <div className="card" style={{ marginBottom: 24. }}>
             <h2 style={{ fontSize: '1rem', marginBottom: 20 }}>
@@ -83,10 +109,6 @@ export default function LabsPage() {
                     <input type="text" placeholder="E3-401" value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} />
                 </div>
             </div>
-            <div className="form-group">
-                <label>연구실 소개</label>
-                <textarea rows={2} placeholder="연구 분야 및 소개를 입력하세요" value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} />
-            </div>
             <div style={{ display: 'flex', gap: 8 }}>
                 <button className="btn btn-primary" onClick={save} disabled={saving || !form.name || !form.professor_name}>
                     {saving ? <><span className="spin">⟳</span> 저장 중...</> : '💾 저장'}
@@ -103,9 +125,15 @@ export default function LabsPage() {
                     <h1 style={{ marginBottom: 4 }}>🔬 연구실 관리</h1>
                     <p>연구실 목록을 추가·수정·삭제합니다</p>
                 </div>
-                {!adding && !editing && (
-                    <button className="btn btn-primary btn-sm" onClick={startAdd}>➕ 연구실 추가</button>
-                )}
+                <div style={{ display: 'flex', gap: 8 }}>
+                    <input type="file" accept=".csv, .xlsx, .xls" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileUpload} />
+                    <button className="btn btn-primary btn-sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+                        {uploading ? <span className="spin">⟳</span> : '📤 CSV/Excel 일괄 등록'}
+                    </button>
+                    {!adding && !editing && (
+                        <button className="btn btn-secondary btn-sm" onClick={startAdd}>➕ 연구실 추가</button>
+                    )}
+                </div>
             </div>
 
             {msg && (
@@ -126,13 +154,12 @@ export default function LabsPage() {
                             <th>교수명</th>
                             <th>세션당 정원</th>
                             <th>위치</th>
-                            <th>소개</th>
                             <th>관리</th>
                         </tr>
                     </thead>
                     <tbody>
                         {labs.length === 0 ? (
-                            <tr><td colSpan={7} style={{ textAlign: 'center', padding: 32, color: 'var(--text3)' }}>연구실이 없습니다</td></tr>
+                            <tr><td colSpan={6} style={{ textAlign: 'center', padding: 32, color: 'var(--text3)' }}>연구실이 없습니다</td></tr>
                         ) : labs.map((lab, i) => (
                             <tr key={lab.id}>
                                 <td style={{ color: 'var(--text3)' }}>{i + 1}</td>
@@ -140,9 +167,6 @@ export default function LabsPage() {
                                 <td style={{ color: 'var(--text2)' }}>{lab.professor_name}</td>
                                 <td style={{ textAlign: 'center' }}><span className="badge badge-1">{lab.capacity}명</span></td>
                                 <td style={{ color: 'var(--text3)', fontSize: '0.85rem' }}>{lab.location || '—'}</td>
-                                <td style={{ color: 'var(--text2)', fontSize: '0.82rem', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                    {lab.description || '—'}
-                                </td>
                                 <td>
                                     <div style={{ display: 'flex', gap: 6 }}>
                                         <button className="btn btn-secondary btn-sm" onClick={() => startEdit(lab)}>✏️ 수정</button>
