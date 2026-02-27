@@ -98,7 +98,11 @@ export default function AssignmentsPage() {
         if (student.choice1_lab_id === labId) return <span className="badge badge-1" style={{ fontSize: '0.7rem', marginLeft: 4 }}>1지망</span>;
         if (student.choice2_lab_id === labId) return <span className="badge badge-2" style={{ fontSize: '0.7rem', marginLeft: 4 }}>2지망</span>;
         if (student.choice3_lab_id === labId) return <span className="badge badge-3" style={{ fontSize: '0.7rem', marginLeft: 4 }}>3지망</span>;
-        return null;
+
+        const c1 = student.choice1_name || '-';
+        const c2 = student.choice2_name || '-';
+        const c3 = student.choice3_name || '-';
+        return <span style={{ fontSize: '0.7rem', color: 'var(--text3)', marginLeft: 6 }}>↳ 지망: 1.{c1} / 2.{c2} / 3.{c3}</span>;
     }
 
     if (loading) return <div style={{ padding: 48, textAlign: 'center', color: 'var(--text2)' }}>불러오는 중...</div>;

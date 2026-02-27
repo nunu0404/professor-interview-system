@@ -192,18 +192,29 @@ export default function PrintPage() {
                                                 {sessionStudents.length === 0 ? (
                                                     <div style={{ fontSize: '0.8rem', color: 'var(--text3)', fontStyle: 'italic' }}>배정 없음</div>
                                                 ) : (
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                                        {sessionStudents.map((a, idx) => (
-                                                            <div key={a.student_id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem' }}>
-                                                                <span style={{ color: 'var(--text3)', minWidth: 20 }}>{idx + 1}.</span>
-                                                                <span style={{ fontWeight: 600 }}>{a.student_name}</span>
-                                                                <span style={{ color: 'var(--text3)' }}>{a.phone}</span>
-                                                                {a.affiliation && <span style={{ color: 'var(--text3)', fontSize: '0.75rem' }}>· {a.affiliation}</span>}
-                                                                <span className={`badge badge-${session}`} style={{ marginLeft: 'auto', fontSize: '0.7rem' }}>
-                                                                    {choiceRank(a, lab.id)}
-                                                                </span>
-                                                            </div>
-                                                        ))}
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                                        {sessionStudents.map((a, idx) => {
+                                                            const rank = choiceRank(a, lab.id);
+                                                            const isManual = rank === '관리자배정';
+                                                            return (
+                                                                <div key={a.student_id} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem' }}>
+                                                                        <span style={{ color: 'var(--text3)', minWidth: 20 }}>{idx + 1}.</span>
+                                                                        <span style={{ fontWeight: 600 }}>{a.student_name}</span>
+                                                                        <span style={{ color: 'var(--text3)' }}>{a.phone}</span>
+                                                                        {a.affiliation && <span style={{ color: 'var(--text3)', fontSize: '0.75rem' }}>· {a.affiliation}</span>}
+                                                                        <span className={`badge badge-${isManual ? 'None' : session}`} style={{ marginLeft: 'auto', fontSize: '0.7rem', background: isManual ? 'var(--bg3)' : undefined, color: isManual ? 'var(--text2)' : undefined }}>
+                                                                            {rank}
+                                                                        </span>
+                                                                    </div>
+                                                                    {isManual && (
+                                                                        <div style={{ marginLeft: 26, fontSize: '0.72rem', color: 'var(--text3)' }}>
+                                                                            ↳ 지망: 1.{labs.find(l => l.id === a.choice1_lab_id)?.name || '-'} / 2.{labs.find(l => l.id === a.choice2_lab_id)?.name || '-'} / 3.{labs.find(l => l.id === a.choice3_lab_id)?.name || '-'}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
                                                     </div>
                                                 )}
                                             </div>
