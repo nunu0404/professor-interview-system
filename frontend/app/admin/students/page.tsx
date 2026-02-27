@@ -72,9 +72,9 @@ export default function StudentsPage() {
                     <p>총 <strong style={{ color: 'var(--accent)' }}>{students.length}명</strong> 신청 완료</p>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                    <input type="file" accept=".csv" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileUpload} />
+                    <input type="file" accept=".csv, .xlsx, .xls" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileUpload} />
                     <button className="btn btn-primary btn-sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-                        {uploading ? <span className="spin">⟳</span> : '📤 CSV 일괄 등록'}
+                        {uploading ? <span className="spin">⟳</span> : '📤 CSV/Excel 일괄 등록'}
                     </button>
                     <button className="btn btn-secondary btn-sm" onClick={load}>🔄 새로고침</button>
                 </div>

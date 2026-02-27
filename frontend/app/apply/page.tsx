@@ -77,7 +77,7 @@ export default function ApplyPage() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError('');
-        if (!form.name || !form.phone || !form.email) { setError('이름, 연락처, 이메일을 모두 입력해주세요.'); return; }
+        if (!form.name || !form.phone || !form.email || !form.affiliation) { setError('이름, 연락처, 이메일, 소속학교를 모두 입력해주세요.'); return; }
         if (!choices[0]) { setError('최소 1지망 연구실을 선택해주세요.'); return; }
         setSubmitting(true);
         try {
@@ -163,9 +163,9 @@ export default function ApplyPage() {
                                 onChange={e => setForm(p => ({ ...p, email: e.target.value }))} required />
                         </div>
                         <div className="form-group">
-                            <label>소속 (선택)</label>
+                            <label>소속학교 *</label>
                             <input id="affiliation" type="text" placeholder="현재 소속 또는 학교" value={form.affiliation}
-                                onChange={e => setForm(p => ({ ...p, affiliation: e.target.value }))} />
+                                onChange={e => setForm(p => ({ ...p, affiliation: e.target.value }))} required />
                         </div>
                     </div>
                 </div>

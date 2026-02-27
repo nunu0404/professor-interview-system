@@ -28,8 +28,8 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { name, phone, email, affiliation, choice1_lab_id, choice2_lab_id, choice3_lab_id } = body;
 
-        if (!name || !phone || !email) {
-            return NextResponse.json({ error: '이름, 연락처, 이메일은 필수입니다.' }, { status: 400 });
+        if (!name || !phone || !email || !affiliation) {
+            return NextResponse.json({ error: '이름, 연락처, 이메일, 소속학교는 필수입니다.' }, { status: 400 });
         }
         if (!choice1_lab_id) {
             return NextResponse.json({ error: '1지망 연구실을 선택해주세요.' }, { status: 400 });
