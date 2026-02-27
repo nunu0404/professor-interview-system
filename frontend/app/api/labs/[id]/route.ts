@@ -5,11 +5,11 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     try {
         const db = getDb();
         const body = await req.json();
-        const { name, professor_name, capacity, description, location } = body;
+        const { name, professor_name, description, location } = body;
         const { id } = await params;
         db.prepare(
             'UPDATE labs SET name=?, professor_name=?, capacity=?, description=?, location=? WHERE id=?'
-        ).run(name, professor_name, capacity, description, location, id);
+        ).run(name, professor_name, 5, description, location, id);
         const lab = db.prepare('SELECT * FROM labs WHERE id = ?').get(id);
         return NextResponse.json(lab);
     } catch (e) {

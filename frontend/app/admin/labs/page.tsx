@@ -3,10 +3,10 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 
 interface Lab {
     id: number; name: string; professor_name: string;
-    capacity: number; location: string;
+    location: string;
 }
 
-const EMPTY_LAB = { name: '', professor_name: '', capacity: 5, location: '' };
+const EMPTY_LAB = { name: '', professor_name: '', location: '' };
 
 export default function LabsPage() {
     const [labs, setLabs] = useState<Lab[]>([]);
@@ -23,7 +23,7 @@ export default function LabsPage() {
 
     function startEdit(lab: Lab) {
         setEditing(lab);
-        setForm({ name: lab.name, professor_name: lab.professor_name, capacity: lab.capacity, location: lab.location || '' });
+        setForm({ name: lab.name, professor_name: lab.professor_name, location: lab.location || '' });
         setAdding(false);
     }
     function startAdd() { setAdding(true); setEditing(null); setForm({ ...EMPTY_LAB }); }
@@ -100,10 +100,7 @@ export default function LabsPage() {
                 </div>
             </div>
             <div className="form-row">
-                <div className="form-group">
-                    <label>세션당 정원</label>
-                    <input type="number" min={1} max={30} value={form.capacity} onChange={e => setForm(p => ({ ...p, capacity: Number(e.target.value) }))} />
-                </div>
+
                 <div className="form-group">
                     <label>위치</label>
                     <input type="text" placeholder="E3-401" value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} />
@@ -152,7 +149,7 @@ export default function LabsPage() {
                             <th>#</th>
                             <th>연구실명</th>
                             <th>교수명</th>
-                            <th>세션당 정원</th>
+
                             <th>위치</th>
                             <th>관리</th>
                         </tr>
@@ -165,7 +162,7 @@ export default function LabsPage() {
                                 <td style={{ color: 'var(--text3)' }}>{i + 1}</td>
                                 <td style={{ fontWeight: 600 }}>{lab.name}</td>
                                 <td style={{ color: 'var(--text2)' }}>{lab.professor_name}</td>
-                                <td style={{ textAlign: 'center' }}><span className="badge badge-1">{lab.capacity}명</span></td>
+
                                 <td style={{ color: 'var(--text3)', fontSize: '0.85rem' }}>{lab.location || '—'}</td>
                                 <td>
                                     <div style={{ display: 'flex', gap: 6 }}>
