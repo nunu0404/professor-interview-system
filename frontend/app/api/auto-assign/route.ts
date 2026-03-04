@@ -11,11 +11,16 @@ export async function POST() {
         const students = db.prepare('SELECT * FROM students').all() as {
             id: number; choice1_lab_id: number; choice2_lab_id: number; choice3_lab_id: number;
         }[];
-        const labs = db.prepare('SELECT * FROM labs').all() as { id: number; capacity: number }[];
+        const labs = db.prepare('SELECT * FROM labs').all() as { id: number; capacity: number; available_sessions: string }[];
 
         // Track how many are assigned to each lab per session
         const slotCount: Record<number, Record<number, number>> = {};
-        labs.forEach(lab => { slotCount[lab.id] = { 1: 0, 2: 0, 3: 0 }; });
+        const labSessionsMap: Record<number, Set<number>> = {};
+        labs.forEach(lab => {
+            slotCount[lab.id] = { 1: 0, 2: 0, 3: 0 };
+            const parsed = (lab.available_sessions || '1,2,3').split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+            labSessionsMap[lab.id] = new Set(parsed);
+        });
 
         // Load existing assignments to count slots already used
         const existing = db.prepare('SELECT * FROM assignments').all() as {
@@ -39,7 +44,7 @@ export async function POST() {
             const result: { item: T, slot: U }[][] = [];
             const currentItem = items[0];
             const remainingItems = items.slice(1);
-            
+
             for (let i = 0; i < slots.length; i++) {
                 const currentSlot = slots[i];
                 const remainingSlots = slots.slice(0, i).concat(slots.slice(i + 1));
@@ -63,7 +68,7 @@ export async function POST() {
                 const studentAssignments = db.prepare(
                     'SELECT session_number, lab_id FROM assignments WHERE student_id = ?'
                 ).all(student.id) as { session_number: number; lab_id: number }[];
-                
+
                 const sessionsUsed = new Set<number>();
                 const labsUsed = new Set<number>();
                 studentAssignments.forEach(a => {
@@ -87,11 +92,32 @@ export async function POST() {
 
                 // Permute sessions mappings to minimize load
                 const perms = generatePermutations(labsToAssign, sessionsToFill);
-                
-                let bestPerm = perms[0];
+
+                // Filter out permutations where a lab is assigned to a session it's not available for
+                const validPerms = [];
+                for (const p of perms) {
+                    let isValid = true;
+                    for (const mapping of p) {
+                        const labId = mapping.item;
+                        const sessionNum = mapping.slot;
+                        if (labSessionsMap[labId] && !labSessionsMap[labId].has(sessionNum)) {
+                            isValid = false;
+                            break;
+                        }
+                    }
+                    if (isValid) validPerms.push(p);
+                }
+
+                if (validPerms.length === 0) {
+                    // Could not find any valid assignment permutation respecting lab availability for this student's choices.
+                    // This student will miss out on some sessions or choices.
+                    continue;
+                }
+
+                let bestPerm = validPerms[0];
                 let minScore = Infinity;
 
-                for (const p of perms) {
+                for (const p of validPerms) {
                     let maxLoad = 0;
                     let sumLoad = 0;
                     for (const mapping of p) {

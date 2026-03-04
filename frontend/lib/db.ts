@@ -31,6 +31,7 @@ function initSchema(db: Database.Database) {
       capacity INTEGER NOT NULL DEFAULT 5,
       description TEXT,
       location TEXT,
+      available_sessions TEXT DEFAULT '1,2,3',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -56,20 +57,27 @@ function initSchema(db: Database.Database) {
     );
   `);
 
+  // Migration: Add available_sessions column if not exists
+  const tableInfo = db.pragma('table_info(labs)') as any[];
+  const hasAvailableSessions = tableInfo.some(col => col.name === 'available_sessions');
+  if (!hasAvailableSessions) {
+    db.exec(`ALTER TABLE labs ADD COLUMN available_sessions TEXT DEFAULT '1,2,3'`);
+  }
+
   // Seed sample labs if empty
   const count = (db.prepare('SELECT COUNT(*) as c FROM labs').get() as { c: number }).c;
   if (count === 0) {
     const insert = db.prepare(`
-      INSERT INTO labs (name, professor_name, capacity, description, location)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO labs (name, professor_name, capacity, description, location, available_sessions)
+      VALUES (?, ?, ?, ?, ?, ?)
     `);
     const labs = [
-      ['인공지능 연구실', '김철수 교수', 6, '머신러닝, 딥러닝, 자연어처리 분야 연구', 'E3-401'],
-      ['컴퓨터비전 연구실', '이영희 교수', 5, '이미지 인식, 객체 탐지, 의료 영상 분석', 'E3-402'],
-      ['분산시스템 연구실', '박민준 교수', 5, '클라우드 컴퓨팅, 엣지 컴퓨팅, 블록체인', 'E3-403'],
-      ['사이버보안 연구실', '최수진 교수', 4, '네트워크 보안, 암호화, 취약점 분석', 'E3-404'],
-      ['HCI 연구실', '정태양 교수', 6, '사용자 인터페이스, 증강현실, UX 연구', 'E3-405'],
-      ['데이터베이스 연구실', '강나라 교수', 5, '빅데이터, 분산 DB, 쿼리 최적화', 'E3-406'],
+      ['인공지능 연구실', '김철수 교수', 6, '머신러닝, 딥러닝, 자연어처리 분야 연구', 'E3-401', '1,2,3'],
+      ['컴퓨터비전 연구실', '이영희 교수', 5, '이미지 인식, 객체 탐지, 의료 영상 분석', 'E3-402', '1,2,3'],
+      ['분산시스템 연구실', '박민준 교수', 5, '클라우드 컴퓨팅, 엣지 컴퓨팅, 블록체인', 'E3-403', '1,2,3'],
+      ['사이버보안 연구실', '최수진 교수', 4, '네트워크 보안, 암호화, 취약점 분석', 'E3-404', '1,2,3'],
+      ['HCI 연구실', '정태양 교수', 6, '사용자 인터페이스, 증강현실, UX 연구', 'E3-405', '1,2,3'],
+      ['데이터베이스 연구실', '강나라 교수', 5, '빅데이터, 분산 DB, 쿼리 최적화', 'E3-406', '1,2,3'],
     ];
     for (const lab of labs) {
       insert.run(...lab);

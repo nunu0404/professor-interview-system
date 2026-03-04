@@ -203,7 +203,7 @@ export default function AssignmentsPage() {
                                             <div style={{ display: 'flex', gap: 4 }}>
                                                 <select
                                                     value={a.lab_id}
-                                                    style={{ width: 140, padding: '4px 8px', fontSize: '0.8rem' }}
+                                                    style={{ minWidth: 140, maxWidth: 240, padding: '4px 8px', fontSize: '0.8rem' }}
                                                     onChange={e => handleAssign(a.student_id, tab, Number(e.target.value))}
                                                 >
                                                     {labs.map(l => (
@@ -252,7 +252,7 @@ export default function AssignmentsPage() {
                                             </div>
                                             <select
                                                 defaultValue=""
-                                                style={{ width: 140, padding: '4px 8px', fontSize: '0.8rem' }}
+                                                style={{ minWidth: 140, maxWidth: 240, padding: '4px 8px', fontSize: '0.8rem' }}
                                                 onChange={e => { if (e.target.value) handleAssign(s.id, tab, Number(e.target.value)); e.target.value = ''; }}
                                             >
                                                 <option value="">연구실 선택</option>

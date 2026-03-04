@@ -4,9 +4,10 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 interface Lab {
     id: number; name: string; professor_name: string;
     location: string;
+    available_sessions: string;
 }
 
-const EMPTY_LAB = { name: '', professor_name: '', location: '' };
+const EMPTY_LAB = { name: '', professor_name: '', location: '', available_sessions: '1,2,3' };
 
 export default function LabsPage() {
     const [labs, setLabs] = useState<Lab[]>([]);
@@ -23,7 +24,7 @@ export default function LabsPage() {
 
     function startEdit(lab: Lab) {
         setEditing(lab);
-        setForm({ name: lab.name, professor_name: lab.professor_name, location: lab.location || '' });
+        setForm({ name: lab.name, professor_name: lab.professor_name, location: lab.location || '', available_sessions: lab.available_sessions || '1,2,3' });
         setAdding(false);
     }
     function startAdd() { setAdding(true); setEditing(null); setForm({ ...EMPTY_LAB }); }
@@ -84,6 +85,19 @@ export default function LabsPage() {
         }
     }
 
+    const toggleSession = (sessionVal: string) => {
+        setForm(p => {
+            let sessions = (p.available_sessions || '1,2,3').split(',').map(s => s.trim()).filter(Boolean);
+            if (sessions.includes(sessionVal)) {
+                sessions = sessions.filter(s => s !== sessionVal);
+            } else {
+                sessions.push(sessionVal);
+            }
+            sessions.sort();
+            return { ...p, available_sessions: sessions.join(',') };
+        });
+    };
+
     const FormPanel = () => (
         <div className="card" style={{ marginBottom: 24. }}>
             <h2 style={{ fontSize: '1rem', marginBottom: 20 }}>
@@ -100,14 +114,36 @@ export default function LabsPage() {
                 </div>
             </div>
             <div className="form-row">
-
                 <div className="form-group">
                     <label>위치</label>
                     <input type="text" placeholder="E3-401" value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} />
                 </div>
+                <div className="form-group">
+                    <label>참여 세션 *</label>
+                    <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
+                        {[1, 2, 3].map(s => {
+                            const val = String(s);
+                            const isChecked = (form.available_sessions || '').includes(val);
+                            return (
+                                <label key={val} style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', margin: 0 }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={isChecked}
+                                        onChange={() => toggleSession(val)}
+                                        style={{ width: '16px', height: '16px' }}
+                                    />
+                                    {s}세션
+                                </label>
+                            );
+                        })}
+                    </div>
+                    {(!form.available_sessions || form.available_sessions.trim() === '') && (
+                        <div style={{ color: 'red', fontSize: '12px', marginTop: '8px' }}>최소 1개 세션을 선택해야 합니다.</div>
+                    )}
+                </div>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-                <button className="btn btn-primary" onClick={save} disabled={saving || !form.name || !form.professor_name}>
+                <button className="btn btn-primary" onClick={save} disabled={saving || !form.name || !form.professor_name || !form.available_sessions}>
                     {saving ? <><span className="spin">⟳</span> 저장 중...</> : '💾 저장'}
                 </button>
                 <button className="btn btn-secondary" onClick={cancel}>취소</button>
@@ -149,7 +185,7 @@ export default function LabsPage() {
                             <th>#</th>
                             <th>연구실명</th>
                             <th>교수명</th>
-
+                            <th>참여 세션</th>
                             <th>위치</th>
                             <th>관리</th>
                         </tr>
@@ -162,7 +198,9 @@ export default function LabsPage() {
                                 <td style={{ color: 'var(--text3)' }}>{i + 1}</td>
                                 <td style={{ fontWeight: 600 }}>{lab.name}</td>
                                 <td style={{ color: 'var(--text2)' }}>{lab.professor_name}</td>
-
+                                <td style={{ color: 'var(--text2)' }}>
+                                    {(lab.available_sessions || '1,2,3').split(',').map(s => `${s}세션`).join(', ')}
+                                </td>
                                 <td style={{ color: 'var(--text3)', fontSize: '0.85rem' }}>{lab.location || '—'}</td>
                                 <td>
                                     <div style={{ display: 'flex', gap: 6 }}>

@@ -54,8 +54,8 @@ export async function POST(req: NextRequest) {
 
         const db = getDb();
         const insert = db.prepare(`
-            INSERT INTO labs (name, professor_name, capacity, location)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO labs (name, professor_name, capacity, location, available_sessions)
+            VALUES (?, ?, ?, ?, '1,2,3')
         `);
 
         let count = 0;

@@ -15,13 +15,13 @@ export async function POST(req: Request) {
     try {
         const db = getDb();
         const body = await req.json();
-        const { name, professor_name, capacity, description, location } = body;
+        const { name, professor_name, capacity, description, location, available_sessions } = body;
         if (!name || !professor_name) {
             return NextResponse.json({ error: '연구실명과 교수명은 필수입니다.' }, { status: 400 });
         }
         const result = db.prepare(
-            'INSERT INTO labs (name, professor_name, capacity, description, location) VALUES (?, ?, ?, ?, ?)'
-        ).run(name, professor_name, capacity ?? 5, description ?? '', location ?? '');
+            'INSERT INTO labs (name, professor_name, capacity, description, location, available_sessions) VALUES (?, ?, ?, ?, ?, ?)'
+        ).run(name, professor_name, capacity ?? 5, description ?? '', location ?? '', available_sessions || '1,2,3');
         const lab = db.prepare('SELECT * FROM labs WHERE id = ?').get(result.lastInsertRowid);
         return NextResponse.json(lab, { status: 201 });
     } catch (e) {
