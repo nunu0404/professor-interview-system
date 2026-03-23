@@ -198,9 +198,33 @@ export default function AdminSettingsPage() {
                             .env.local에 <code>ADMIN_PASSWORD=yourpassword</code>를 추가하세요.
                         </div>
                     </div>
+                </div>
+
+                {/* ── Access URL Info (New) ── */}
+                <div className="card">
+                    <h2 style={{ fontSize: '1rem', marginBottom: 4 }}>🌐 시스템 접속 주소 (QR)</h2>
+                    <p style={{ fontSize: '0.85rem', marginBottom: 20 }}>
+                        학생들이 접속할 주소입니다. 인쇄용 QR 코드를 위해 고정된 주소가 필요한 경우 설정하세요.
+                    </p>
+                    <div style={{ padding: '12px 16px', borderRadius: 8, background: 'var(--surface2)', fontSize: '0.85rem' }}>
+                        <div style={{ marginBottom: 8 }}>
+                            현재 설정된 주소: <br />
+                            <code style={{ color: 'var(--accent)', wordBreak: 'break-all' }}>
+                                {process.env.NEXT_PUBLIC_BASE_URL || '(자동 감지 모드)'}
+                            </code>
+                        </div>
+                        <div style={{ color: 'var(--text3)', fontSize: '0.8rem' }}>
+                            {process.env.NEXT_PUBLIC_BASE_URL
+                                ? '✅ 고정된 주소를 사용 중입니다. 인쇄물에 사용하기 적합합니다.'
+                                : '⚠️ 현재 접속한 IP를 기반으로 QR이 생성됩니다. 서버 IP가 바뀌면 QR도 바뀝니다.'}
+                        </div>
+                        <div style={{ color: 'var(--text3)', fontSize: '0.8rem', marginTop: 8 }}>
+                            고정하려면 .env.local에 <code>NEXT_PUBLIC_BASE_URL=https://your-domain.com</code>을 추가하세요.
+                        </div>
+                    </div>
                     <div style={{ marginTop: 16 }}>
                         <a href="/admin/result-qr" className="btn btn-secondary btn-sm" style={{ marginRight: 8 }}>
-                            📱 결과 확인 QR 페이지
+                            📱 QR 코드 확인하기
                         </a>
                     </div>
                 </div>

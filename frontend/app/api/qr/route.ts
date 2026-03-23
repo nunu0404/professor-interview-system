@@ -20,28 +20,39 @@ function getNetworkIp() {
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
-        // Allow custom URL override via ?target= or ?url=
+        // Order of precedence:
+        // 1. ?target= or ?url= query parameter
+        // 2. NEXT_PUBLIC_BASE_URL (for static QR codes across different environments)
+        // 3. Dynamic host detection (current behavior)
         let applyUrl = searchParams.get('target') || searchParams.get('url');
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
         if (!applyUrl || applyUrl === 'null' || applyUrl === 'undefined') {
-            const headersList = await headers();
-            let host = headersList.get('host') || 'localhost:3000';
+            if (baseUrl) {
+                // remove trailing slash if exists
+                const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+                applyUrl = `${cleanBase}/apply`;
+            } else {
+                const headersList = await headers();
+                let host = headersList.get('host') || 'localhost:3000';
 
-            // IMPORTANT: If host is localhost, replace it with the network IP
-            // so phones scanning the QR can actually connect
-            if (host.startsWith('localhost') || host.startsWith('127.0.0.1')) {
-                const port = host.split(':')[1] || '3000';
-                const ip = getNetworkIp();
-                if (ip !== 'localhost') {
-                    host = `${ip}:${port}`;
+                // IMPORTANT: If host is localhost, replace it with the network IP
+                // so phones scanning the QR can actually connect
+                if (host.startsWith('localhost') || host.startsWith('127.0.0.1')) {
+                    const port = host.split(':')[1] || '3000';
+                    const ip = getNetworkIp();
+                    if (ip !== 'localhost') {
+                        host = `${ip}:${port}`;
+                    }
                 }
+
+                // Use 'http' for localhost or local IP addresses (starts with 192, 10, 172, or 127)
+                const isLocal = host.startsWith('localhost') ||
+                    host.match(/^(192|10|172\.1[6-9]|172\.2[0-9]|172\.3[0-1]|127)\./) !== null;
+                const proto = isLocal ? 'http' : 'https';
+
+                applyUrl = `${proto}://${host}/apply`;
             }
-
-            // Use 'http' for localhost or local IP addresses (starts with 192, 10, 172, or 127)
-            const isLocal = host.startsWith('localhost') ||
-                host.match(/^(192|10|172\.1[6-9]|172\.2[0-9]|172\.3[0-1]|127)\./) !== null;
-            const proto = isLocal ? 'http' : 'https';
-
-            applyUrl = `${proto}://${host}/apply`;
         }
 
         const qrDataUrl = await QRCode.toDataURL(applyUrl, {
