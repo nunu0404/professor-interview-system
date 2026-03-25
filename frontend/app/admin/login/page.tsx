@@ -70,14 +70,6 @@ function LoginForm() {
                     </button>
                 </form>
 
-                <div style={{
-                    marginTop: 24, padding: '12px 16px', borderRadius: 8,
-                    background: 'var(--surface2)', fontSize: '0.8rem', color: 'var(--text3)',
-                    display: 'flex', flexDirection: 'column', gap: '4px'
-                }}>
-                    <div>💡 기본 비밀번호: <code style={{ color: 'var(--accent)' }}>openlab2026</code></div>
-                    <div>💡 교수/연구실 계정: <code style={{ color: 'var(--accent)' }}>viewer2026</code></div>
-                </div>
             </div>
         </div>
     );

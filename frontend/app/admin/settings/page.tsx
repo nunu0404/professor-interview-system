@@ -19,6 +19,8 @@ export default function AdminSettingsPage() {
     const [studentCount, setStudentCount] = useState(0);
     const [assignCount, setAssignCount] = useState(0);
     const [publishing, setPublishing] = useState(false);
+    const [showAdminPw, setShowAdminPw] = useState(false);
+    const [showViewerPw, setShowViewerPw] = useState(false);
 
     const load = useCallback(async () => {
         const [s, st, as] = await Promise.all([
@@ -186,16 +188,43 @@ export default function AdminSettingsPage() {
 
                 {/* ── Password info ── */}
                 <div className="card">
-                    <h2 style={{ fontSize: '1rem', marginBottom: 4 }}>🔐 관리자 비밀번호</h2>
+                    <h2 style={{ fontSize: '1rem', marginBottom: 4 }}>🔐 계정 비밀번호 관리</h2>
                     <p style={{ fontSize: '0.85rem', marginBottom: 20 }}>
-                        비밀번호 변경은 서버 환경변수 <code>ADMIN_PASSWORD</code>를 수정하세요.
+                        비밀번호 변경은 서버 환경변수를 수정하세요.
                     </p>
-                    <div style={{ padding: '12px 16px', borderRadius: 8, background: 'var(--surface2)', fontSize: '0.85rem' }}>
-                        <div style={{ marginBottom: 8 }}>현재 비밀번호: <code style={{ color: 'var(--accent)' }}>
-                            {process.env.NEXT_PUBLIC_ADMIN_PW_HINT || 'openlab2026 (기본값)'}
-                        </code></div>
-                        <div style={{ color: 'var(--text3)', fontSize: '0.8rem' }}>
-                            .env.local에 <code>ADMIN_PASSWORD=yourpassword</code>를 추가하세요.
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        {/* Admin Password */}
+                        <div style={{ padding: '12px 16px', borderRadius: 8, background: 'var(--surface2)', fontSize: '0.85rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                                <span style={{ color: 'var(--text2)' }}>관리자 비밀번호</span>
+                                <button className="btn btn-secondary btn-sm" style={{ padding: '2px 8px', fontSize: '0.7rem' }}
+                                    onClick={() => setShowAdminPw(!showAdminPw)}>
+                                    {showAdminPw ? '숨기기' : '보기'}
+                                </button>
+                            </div>
+                            <code style={{ color: 'var(--accent)', fontSize: '0.9rem' }}>
+                                {showAdminPw ? (process.env.NEXT_PUBLIC_ADMIN_PW_HINT || 'openlab2026') : '••••••••'}
+                            </code>
+                            <div style={{ color: 'var(--text3)', fontSize: '0.75rem', marginTop: 4 }}>
+                                <code>ADMIN_PASSWORD</code> 환경변수로 수정
+                            </div>
+                        </div>
+
+                        {/* Viewer/Professor Password */}
+                        <div style={{ padding: '12px 16px', borderRadius: 8, background: 'var(--surface2)', fontSize: '0.85rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                                <span style={{ color: 'var(--text2)' }}>교수/연구자 비밀번호</span>
+                                <button className="btn btn-secondary btn-sm" style={{ padding: '2px 8px', fontSize: '0.7rem' }}
+                                    onClick={() => setShowViewerPw(!showViewerPw)}>
+                                    {showViewerPw ? '숨기기' : '보기'}
+                                </button>
+                            </div>
+                            <code style={{ color: 'var(--accent)', fontSize: '0.9rem' }}>
+                                {showViewerPw ? (process.env.NEXT_PUBLIC_VIEWER_PW_HINT || 'viewer2026') : '••••••••'}
+                            </code>
+                            <div style={{ color: 'var(--text3)', fontSize: '0.75rem', marginTop: 4 }}>
+                                <code>VIEWER_PASSWORD</code> 환경변수로 수정
+                            </div>
                         </div>
                     </div>
                 </div>
