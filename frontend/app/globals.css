@@ -630,6 +630,7 @@ tr:hover td {
   color: var(--accent);
   font-weight: 600;
   min-width: 120px;
+  margin-right: 8px;
 }
 
 .tl-now {
@@ -764,14 +765,22 @@ tr:hover td {
   }
 
   .timeline-item {
+    display: flex !important;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
     padding: 16px 0;
   }
 
   .timeline-time {
     min-width: unset;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    margin-right: 0;
+  }
+
+  .timeline-place {
+    min-width: unset !important;
+    display: block;
+    font-weight: 500;
   }
 
   .tl-now {

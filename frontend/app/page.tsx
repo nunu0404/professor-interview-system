@@ -108,7 +108,7 @@ export default function QRPage() {
                         {SCHEDULE.map((s, i) => (
                             <div key={i} className={`timeline-item ${i === 3 ? 'tl-now' : ''}`}>
                                 <span className="timeline-time">{s.time}</span>
-                                <span style={{ minWidth: 80, color: 'var(--text3)', fontSize: '0.8rem' }}>{s.place}</span>
+                                <span className="timeline-place" style={{ minWidth: 80, color: 'var(--text3)', fontSize: '0.8rem' }}>{s.place}</span>
                                 <div>
                                     <div style={{ color: 'var(--text)', fontWeight: i >= 3 && i <= 5 ? 600 : 400 }}>{s.content}</div>
                                     {s.note && <div style={{ color: 'var(--text3)', fontSize: '0.8rem' }}>{s.note}</div>}
