@@ -28,31 +28,10 @@ export async function GET(req: Request) {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
         if (!applyUrl || applyUrl === 'null' || applyUrl === 'undefined') {
-            if (baseUrl) {
-                // remove trailing slash if exists
-                const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-                applyUrl = `${cleanBase}/apply`;
-            } else {
-                const headersList = await headers();
-                let host = headersList.get('host') || 'localhost:3000';
-
-                // IMPORTANT: If host is localhost, replace it with the network IP
-                // so phones scanning the QR can actually connect
-                if (host.startsWith('localhost') || host.startsWith('127.0.0.1')) {
-                    const port = host.split(':')[1] || '3000';
-                    const ip = getNetworkIp();
-                    if (ip !== 'localhost') {
-                        host = `${ip}:${port}`;
-                    }
-                }
-
-                // Use 'http' for localhost or local IP addresses (starts with 192, 10, 172, or 127)
-                const isLocal = host.startsWith('localhost') ||
-                    host.match(/^(192|10|172\.1[6-9]|172\.2[0-9]|172\.3[0-1]|127)\./) !== null;
-                const proto = isLocal ? 'http' : 'https';
-
-                applyUrl = `${proto}://${host}/apply`;
-            }
+            const finalBaseUrl = baseUrl || 'http://3.36.16.74:3000';
+            // remove trailing slash if exists
+            const cleanBase = finalBaseUrl.endsWith('/') ? finalBaseUrl.slice(0, -1) : finalBaseUrl;
+            applyUrl = `${cleanBase}/apply`;
         }
 
         const qrDataUrl = await QRCode.toDataURL(applyUrl, {

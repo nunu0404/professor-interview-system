@@ -239,7 +239,7 @@ export default function AdminSettingsPage() {
                         <div style={{ marginBottom: 8 }}>
                             현재 설정된 주소: <br />
                             <code style={{ color: 'var(--accent)', wordBreak: 'break-all' }}>
-                                {process.env.NEXT_PUBLIC_BASE_URL || '(자동 감지 모드)'}
+                                {process.env.NEXT_PUBLIC_BASE_URL || 'http://3.36.16.74:3000'}
                             </code>
                         </div>
                         <div style={{ color: 'var(--text3)', fontSize: '0.8rem' }}>
