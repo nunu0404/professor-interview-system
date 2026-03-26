@@ -98,59 +98,6 @@ export default function LabsPage() {
         });
     };
 
-    const FormPanel = () => (
-        <div className="card" style={{ marginBottom: 24. }}>
-            <h2 style={{ fontSize: '1rem', marginBottom: 20 }}>
-                {editing ? '✏️ 연구실 수정' : '➕ 연구실 추가'}
-            </h2>
-            <div className="form-row">
-                <div className="form-group">
-                    <label>연구실명 *</label>
-                    <input type="text" placeholder="OO 연구실" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
-                </div>
-                <div className="form-group">
-                    <label>교수명 *</label>
-                    <input type="text" placeholder="홍길동 교수" value={form.professor_name} onChange={e => setForm(p => ({ ...p, professor_name: e.target.value }))} />
-                </div>
-            </div>
-            <div className="form-row">
-                <div className="form-group">
-                    <label>위치</label>
-                    <input type="text" placeholder="E3-401" value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} />
-                </div>
-                <div className="form-group">
-                    <label>참여 세션 *</label>
-                    <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
-                        {[1, 2, 3].map(s => {
-                            const val = String(s);
-                            const isChecked = (form.available_sessions || '').includes(val);
-                            return (
-                                <label key={val} style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', margin: 0 }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={isChecked}
-                                        onChange={() => toggleSession(val)}
-                                        style={{ width: '16px', height: '16px' }}
-                                    />
-                                    {s}세션
-                                </label>
-                            );
-                        })}
-                    </div>
-                    {(!form.available_sessions || form.available_sessions.trim() === '') && (
-                        <div style={{ color: 'red', fontSize: '12px', marginTop: '8px' }}>최소 1개 세션을 선택해야 합니다.</div>
-                    )}
-                </div>
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-                <button className="btn btn-primary" onClick={save} disabled={saving || !form.name || !form.professor_name || !form.available_sessions}>
-                    {saving ? <><span className="spin">⟳</span> 저장 중...</> : '💾 저장'}
-                </button>
-                <button className="btn btn-secondary" onClick={cancel}>취소</button>
-            </div>
-        </div>
-    );
-
     return (
         <div className="fade-in">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
@@ -176,7 +123,58 @@ export default function LabsPage() {
                 </div>
             )}
 
-            {(adding || editing) && <FormPanel />}
+            {(adding || editing) && (
+                <div className="card" style={{ marginBottom: 24. }}>
+                    <h2 style={{ fontSize: '1rem', marginBottom: 20 }}>
+                        {editing ? '✏️ 연구실 수정' : '➕ 연구실 추가'}
+                    </h2>
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label>연구실명 *</label>
+                            <input type="text" placeholder="OO 연구실" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
+                        </div>
+                        <div className="form-group">
+                            <label>교수명 *</label>
+                            <input type="text" placeholder="홍길동 교수" value={form.professor_name} onChange={e => setForm(p => ({ ...p, professor_name: e.target.value }))} />
+                        </div>
+                    </div>
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label>위치</label>
+                            <input type="text" placeholder="E3-401" value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} />
+                        </div>
+                        <div className="form-group">
+                            <label>참여 세션 *</label>
+                            <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
+                                {[1, 2, 3].map(s => {
+                                    const val = String(s);
+                                    const isChecked = (form.available_sessions || '').includes(val);
+                                    return (
+                                        <label key={val} style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', margin: 0 }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={isChecked}
+                                                onChange={() => toggleSession(val)}
+                                                style={{ width: '16px', height: '16px' }}
+                                            />
+                                            {s}세션
+                                        </label>
+                                    );
+                                })}
+                            </div>
+                            {(!form.available_sessions || form.available_sessions.trim() === '') && (
+                                <div style={{ color: 'red', fontSize: '12px', marginTop: '8px' }}>최소 1개 세션을 선택해야 합니다.</div>
+                            )}
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                        <button className="btn btn-primary" onClick={save} disabled={saving || !form.name || !form.professor_name || !form.available_sessions}>
+                            {saving ? <><span className="spin">⟳</span> 저장 중...</> : '💾 저장'}
+                        </button>
+                        <button className="btn btn-secondary" onClick={cancel}>취소</button>
+                    </div>
+                </div>
+            )}
 
             <div className="table-wrap">
                 <table>
