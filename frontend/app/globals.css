@@ -734,3 +734,47 @@ tr:hover td {
     color: #555 !important;
   }
 }
+
+/* ---------- Mobile Responsiveness for Landing Page ---------- */
+@media (max-width: 600px) {
+  .qr-screen {
+    padding: 16px;
+    align-items: flex-start;
+  }
+
+  .qr-container {
+    padding-top: 20px;
+  }
+
+  .qr-container h1 {
+    font-size: 1.6rem;
+  }
+
+  .qr-box {
+    padding: 24px 16px;
+    width: 100%;
+  }
+
+  .qr-image {
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+    aspect-ratio: 1/1;
+    margin: 0 auto;
+  }
+
+  .timeline-item {
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 0;
+  }
+
+  .timeline-time {
+    min-width: unset;
+    font-size: 0.9rem;
+  }
+
+  .tl-now {
+    padding: 12px;
+  }
+}
