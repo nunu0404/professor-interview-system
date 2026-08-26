@@ -1,20 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
 
-const SCHEDULE = [
-    { time: '13:00~13:10', place: 'E3-112', content: '학과 소개', note: '학과장님 진행' },
-    { time: '13:10~14:05', place: 'E3 로비', content: '연구실별 포스터 발표 + 스탬프 챌린지', note: 'Session 2·3 선착순 신청' },
-    { time: '14:05~14:15', place: 'E3-112', content: 'Break Time', note: '기념품 및 여비지원 신청서 배부' },
-    { time: '14:15~15:00', place: '연구실별', content: '[Session 1] 실험실 투어 및 면담', note: '사전 배정 연구실' },
-    { time: '15:00~15:45', place: '연구실별', content: '[Session 2] 실험실 투어 및 면담', note: '' },
-    { time: '15:45~16:30', place: '연구실별', content: '[Session 3] 실험실 투어 및 면담', note: '' },
-    { time: '16:30~16:45', place: 'E3-112', content: '폐회', note: '서류 제출, 셔틀버스 이동' },
-];
-
 export default function QRPage() {
     const [count, setCount] = useState<number | null>(null);
     const [applyUrl, setApplyUrl] = useState('');
-    const [now, setNow] = useState(new Date());
+    const [surveyUrl, setSurveyUrl] = useState('');
+    const [now, setNow] = useState<Date | null>(null);
 
     useEffect(() => {
         const loadHost = async () => {
@@ -30,6 +21,7 @@ export default function QRPage() {
             const isLocal = host === 'localhost' || host.match(/^(192|10|172|127)\./);
             const protocol = isLocal ? 'http:' : window.location.protocol;
             setApplyUrl(`${protocol}//${host}${port}/apply`);
+            setSurveyUrl(`${protocol}//${host}${port}/survey`);
         };
         loadHost();
 
@@ -41,6 +33,7 @@ export default function QRPage() {
         };
         fetchCount();
         const pollId = setInterval(fetchCount, 5000);
+        setNow(new Date());
         const clockId = setInterval(() => setNow(new Date()), 1000);
         return () => { clearInterval(pollId); clearInterval(clockId); };
     }, []);
@@ -53,7 +46,7 @@ export default function QRPage() {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 12 }}>
                         <span className="live-dot" />
                         <span style={{ fontSize: '0.8rem', color: 'var(--text2)', fontWeight: 500 }}>
-                            {now.toLocaleTimeString('ko-KR')} 신청 현황 실시간 반영 중
+                            {now ? now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) : '--:--:--'} 신청 현황 실시간 반영 중
                         </span>
                     </div>
                     <h1 style={{ fontSize: '2.2rem', fontWeight: 800, marginBottom: 8 }}>
@@ -99,22 +92,24 @@ export default function QRPage() {
                     </div>
                 </div>
 
-                {/* Schedule */}
-                <div className="card" style={{ marginTop: 32, textAlign: 'left' }}>
-                    <h3 style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-                        🗓️ 오늘의 일정
-                    </h3>
-                    <div className="timeline">
-                        {SCHEDULE.map((s, i) => (
-                            <div key={i} className={`timeline-item ${i === 3 ? 'tl-now' : ''}`}>
-                                <span className="timeline-time">{s.time}</span>
-                                <span className="timeline-place" style={{ minWidth: 80, color: 'var(--text3)', fontSize: '0.8rem' }}>{s.place}</span>
-                                <div>
-                                    <div style={{ color: 'var(--text)', fontWeight: i >= 3 && i <= 5 ? 600 : 400 }}>{s.content}</div>
-                                    {s.note && <div style={{ color: 'var(--text3)', fontSize: '0.8rem' }}>{s.note}</div>}
-                                </div>
-                            </div>
-                        ))}
+                {/* Survey Section */}
+                <div className="card" style={{ marginTop: 32, textAlign: 'center', padding: '32px 20px', border: '2px solid var(--primary)' }}>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: 12 }}>📝 만족도 조사</h2>
+                    <p style={{ color: 'var(--text2)', marginBottom: 24 }}>행사가 끝나신 후, 아래 QR 코드를 스캔하여 만족도 조사에 참여해 주세요.</p>
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src={`/api/qr?url=${encodeURIComponent(surveyUrl)}`}
+                            alt="만족도 조사 QR 코드"
+                            className="qr-image"
+                            style={{ display: 'block', width: 200, height: 200, borderRadius: 12, border: '4px solid var(--surface2)' }}
+                        />
+                        <p style={{ marginTop: 16, fontSize: '0.85rem', color: 'var(--text3)', wordBreak: 'break-all' }}>
+                            {surveyUrl}
+                        </p>
+                        <a href="/survey" className="btn btn-primary" style={{ marginTop: 16 }}>
+                            만족도 조사 작성하기
+                        </a>
                     </div>
                 </div>
 

@@ -10,6 +10,7 @@ const NAV_LINKS = [
     { href: '/admin/labs', label: '🔬 연구실 관리' },
     { href: '/admin/print', label: '🖨️ 배정 명단' },
     { href: '/admin/settings', label: '⚙️ 설정' },
+    { href: '/admin/surveys', label: '📋 설문 결과' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

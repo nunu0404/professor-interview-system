@@ -55,6 +55,21 @@ function initSchema(db: Database.Database) {
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       UNIQUE(student_id, session_number)
     );
+
+    CREATE TABLE IF NOT EXISTS surveys (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      affiliation TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      email TEXT NOT NULL,
+      q2 TEXT NOT NULL,
+      q3 TEXT NOT NULL,
+      q4 TEXT NOT NULL,
+      q5 TEXT NOT NULL,
+      q6 TEXT NOT NULL,
+      q7 TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   // Migration: Add available_sessions column if not exists
