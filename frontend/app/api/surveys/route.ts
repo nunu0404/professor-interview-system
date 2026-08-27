@@ -22,6 +22,12 @@ export async function POST(request: Request) {
         }
 
         const db = getDb();
+        
+        const existing = db.prepare('SELECT id FROM surveys WHERE phone = ?').get(phone);
+        if (existing) {
+            return NextResponse.json({ error: '이미 해당 전화번호로 제출된 설문 내역이 있습니다.' }, { status: 409 });
+        }
+
         const stmt = db.prepare(`
             INSERT INTO surveys (name, affiliation, phone, email, q2, q3, q4, q5, q6, q7)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

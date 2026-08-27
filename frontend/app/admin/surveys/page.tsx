@@ -1,5 +1,35 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+
+function getMultipleChoiceData(surveys: any[], key: string) {
+    const counts: Record<string, number> = {};
+    surveys.forEach(s => {
+        if (!s[key]) return;
+        const items = s[key].split(', ');
+        items.forEach((item: string) => {
+            const clean = item.trim();
+            if (clean) counts[clean] = (counts[clean] || 0) + 1;
+        });
+    });
+    return Object.entries(counts)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value);
+}
+
+function getSingleChoiceData(surveys: any[], key: string) {
+    const counts: Record<string, number> = {};
+    surveys.forEach(s => {
+        if (!s[key]) return;
+        const clean = s[key].trim();
+        if (clean) counts[clean] = (counts[clean] || 0) + 1;
+    });
+    return Object.entries(counts)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value);
+}
 
 export default function AdminSurveys() {
     const [surveys, setSurveys] = useState<any[]>([]);
@@ -20,6 +50,12 @@ export default function AdminSurveys() {
 
     if (loading) return <div style={{ padding: 48, textAlign: 'center', color: 'var(--text2)' }}>불러오는 중...</div>;
 
+    const q2Data = getMultipleChoiceData(surveys, 'q2');
+    const q3Data = getMultipleChoiceData(surveys, 'q3');
+    const q4Data = getMultipleChoiceData(surveys, 'q4');
+    const q5Data = getSingleChoiceData(surveys, 'q5');
+    const q6Data = getSingleChoiceData(surveys, 'q6');
+
     return (
         <div className="fade-in">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
@@ -38,7 +74,74 @@ export default function AdminSurveys() {
                 </div>
             </div>
 
+            {surveys.length > 0 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: 20, marginBottom: 20 }}>
+                    <div className="card">
+                        <h3 style={{ fontSize: '0.95rem', marginBottom: 16 }}>Q2. 알게 된 경로</h3>
+                        <ResponsiveContainer width="100%" height={250}>
+                            <BarChart data={q2Data} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+                                <XAxis type="number" hide />
+                                <YAxis dataKey="name" type="category" width={150} tick={{ fontSize: 11 }} />
+                                <Tooltip />
+                                <Bar dataKey="value" fill={COLORS[0]} radius={[0, 4, 4, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    <div className="card">
+                        <h3 style={{ fontSize: '0.95rem', marginBottom: 16 }}>Q3. 참석하게 된 이유</h3>
+                        <ResponsiveContainer width="100%" height={250}>
+                            <BarChart data={q3Data} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+                                <XAxis type="number" hide />
+                                <YAxis dataKey="name" type="category" width={150} tick={{ fontSize: 11 }} />
+                                <Tooltip />
+                                <Bar dataKey="value" fill={COLORS[1]} radius={[0, 4, 4, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    <div className="card">
+                        <h3 style={{ fontSize: '0.95rem', marginBottom: 16 }}>Q4. 관심을 갖게 된 이유</h3>
+                        <ResponsiveContainer width="100%" height={250}>
+                            <BarChart data={q4Data} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+                                <XAxis type="number" hide />
+                                <YAxis dataKey="name" type="category" width={150} tick={{ fontSize: 11 }} />
+                                <Tooltip />
+                                <Bar dataKey="value" fill={COLORS[2]} radius={[0, 4, 4, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    <div className="card">
+                        <h3 style={{ fontSize: '0.95rem', marginBottom: 16 }}>Q5. 진학 결정 도움 여부</h3>
+                        <ResponsiveContainer width="100%" height={250}>
+                            <PieChart>
+                                <Pie data={q5Data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                                    {q5Data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                                </Pie>
+                                <Tooltip />
+                                <Legend />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    <div className="card">
+                        <h3 style={{ fontSize: '0.95rem', marginBottom: 16 }}>Q6. 개최 요일 선호도</h3>
+                        <ResponsiveContainer width="100%" height={250}>
+                            <PieChart>
+                                <Pie data={q6Data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                                    {q6Data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                                </Pie>
+                                <Tooltip />
+                                <Legend />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            )}
+
             <div className="card" style={{ overflowX: 'auto' }}>
+                <h3 style={{ fontSize: '1rem', marginBottom: 16 }}>상세 응답 내역</h3>
                 {surveys.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text3)' }}>
                         아직 제출된 설문 응답이 없습니다.
