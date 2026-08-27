@@ -100,7 +100,7 @@ export default function SurveyPage() {
                     </div>
                     
                     <div className="form-group">
-                        <label className="form-label">출신 대학 <span style={{ color: 'var(--danger)' }}>*</span></label>
+                        <label className="form-label">소속 대학 <span style={{ color: 'var(--danger)' }}>*</span></label>
                         <input type="text" name="affiliation" className="form-input" required placeholder="OO대학교" />
                     </div>
 

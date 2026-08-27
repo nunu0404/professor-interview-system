@@ -34,3 +34,14 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: '서버 오류로 인해 제출에 실패했습니다.' }, { status: 500 });
     }
 }
+
+export async function DELETE() {
+    try {
+        const db = getDb();
+        db.prepare('DELETE FROM surveys').run();
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('Failed to clear surveys:', error);
+        return NextResponse.json({ error: 'Failed to clear surveys' }, { status: 500 });
+    }
+}

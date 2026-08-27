@@ -27,7 +27,13 @@ export default function AdminSurveys() {
                     <h1 style={{ marginBottom: 4 }}>📋 만족도 조사 결과</h1>
                     <p>총 {surveys.length}건의 설문 응답</p>
                 </div>
-                <div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={async () => {
+                        if (confirm('모든 설문 결과를 정말로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                            await fetch('/api/surveys', { method: 'DELETE' });
+                            window.location.reload();
+                        }
+                    }} className="btn btn-danger btn-sm">🗑️ 전체 초기화</button>
                     <a href="/api/export/surveys" download className="btn btn-primary btn-sm">⬇️ 설문 CSV 다운로드</a>
                 </div>
             </div>
@@ -43,7 +49,7 @@ export default function AdminSurveys() {
                             <tr style={{ borderBottom: '2px solid var(--border)', textAlign: 'left' }}>
                                 <th style={{ padding: '12px 8px' }}>제출 일시</th>
                                 <th style={{ padding: '12px 8px' }}>이름</th>
-                                <th style={{ padding: '12px 8px' }}>출신 대학</th>
+                                <th style={{ padding: '12px 8px' }}>소속 대학</th>
                                 <th style={{ padding: '12px 8px' }}>전화번호</th>
                                 <th style={{ padding: '12px 8px' }}>알게 된 경로 (Q2)</th>
                                 <th style={{ padding: '12px 8px' }}>참석 이유 (Q3)</th>
