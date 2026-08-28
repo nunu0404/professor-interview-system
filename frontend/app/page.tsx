@@ -62,7 +62,7 @@ export default function QRPage() {
                     <div className="qr-box">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                            src="/api/qr"
+                            src={`/api/qr?url=${encodeURIComponent(applyUrl)}`}
                             alt="신청 QR 코드"
                             className="qr-image"
                             style={{ display: 'block' }}

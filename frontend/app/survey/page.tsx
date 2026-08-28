@@ -94,27 +94,7 @@ export default function SurveyPage() {
                 </div>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                    <div className="form-group">
-                        <label className="form-label">이름 <span style={{ color: 'var(--danger)' }}>*</span></label>
-                        <input type="text" name="name" className="form-input" required placeholder="홍길동" />
-                    </div>
-                    
-                    <div className="form-group">
-                        <label className="form-label">소속 대학 <span style={{ color: 'var(--danger)' }}>*</span></label>
-                        <input type="text" name="affiliation" className="form-input" required placeholder="OO대학교" />
-                    </div>
 
-                    <div className="form-group">
-                        <label className="form-label">전화번호 <span style={{ color: 'var(--danger)' }}>*</span></label>
-                        <input type="tel" name="phone" className="form-input" required placeholder="010-1234-5678" />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">이메일 주소 <span style={{ color: 'var(--danger)' }}>*</span></label>
-                        <input type="email" name="email" className="form-input" required placeholder="example@email.com" />
-                    </div>
-
-                    <hr style={{ border: 0, borderTop: '1px solid var(--border)', margin: '12px 0' }} />
 
                     <div className="form-group">
                         <label className="form-label">2. DGIST 오픈랩 행사를 알게 된 경로 (복수 선택 가능) <span style={{ color: 'var(--danger)' }}>*</span></label>

@@ -15,24 +15,19 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { name, affiliation, phone, email, q2, q3, q4, q5, q6, q7 } = body;
+        const { q2, q3, q4, q5, q6, q7 } = body;
 
-        if (!name || !affiliation || !phone || !email || !q2 || !q3 || !q4 || !q5 || !q6) {
+        if (!q2 || !q3 || !q4 || !q5 || !q6) {
             return NextResponse.json({ error: '필수 항목이 누락되었습니다.' }, { status: 400 });
         }
 
         const db = getDb();
         
-        const existing = db.prepare('SELECT id FROM surveys WHERE phone = ?').get(phone);
-        if (existing) {
-            return NextResponse.json({ error: '이미 해당 전화번호로 제출된 설문 내역이 있습니다.' }, { status: 409 });
-        }
-
         const stmt = db.prepare(`
             INSERT INTO surveys (name, affiliation, phone, email, q2, q3, q4, q5, q6, q7)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
-        const result = stmt.run(name, affiliation, phone, email, q2, q3, q4, q5, q6, q7 || '');
+        const result = stmt.run('', '', '', '', q2, q3, q4, q5, q6, q7 || '');
 
         return NextResponse.json({ success: true, id: result.lastInsertRowid });
     } catch (error) {

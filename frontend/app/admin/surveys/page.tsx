@@ -151,9 +151,6 @@ export default function AdminSurveys() {
                         <thead>
                             <tr style={{ borderBottom: '2px solid var(--border)', textAlign: 'left' }}>
                                 <th style={{ padding: '12px 8px' }}>제출 일시</th>
-                                <th style={{ padding: '12px 8px' }}>이름</th>
-                                <th style={{ padding: '12px 8px' }}>소속 대학</th>
-                                <th style={{ padding: '12px 8px' }}>전화번호</th>
                                 <th style={{ padding: '12px 8px' }}>알게 된 경로 (Q2)</th>
                                 <th style={{ padding: '12px 8px' }}>참석 이유 (Q3)</th>
                                 <th style={{ padding: '12px 8px' }}>관심 이유 (Q4)</th>
@@ -167,9 +164,6 @@ export default function AdminSurveys() {
                                     <td style={{ padding: '12px 8px', color: 'var(--text3)' }}>
                                         {new Date(s.created_at).toLocaleString('ko-KR')}
                                     </td>
-                                    <td style={{ padding: '12px 8px', fontWeight: 600 }}>{s.name}</td>
-                                    <td style={{ padding: '12px 8px' }}>{s.affiliation}</td>
-                                    <td style={{ padding: '12px 8px' }}>{s.phone}</td>
                                     <td style={{ padding: '12px 8px' }}>{s.q2}</td>
                                     <td style={{ padding: '12px 8px' }}>{s.q3}</td>
                                     <td style={{ padding: '12px 8px' }}>{s.q4}</td>
